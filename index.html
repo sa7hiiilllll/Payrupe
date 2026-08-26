@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FastPay Payout</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui;background:#0b1020;color:#fff;min-height:100vh;display:grid;place-items:center}
+.card{width:min(440px,92vw);background:#151c31;border:1px solid #2b3552;border-radius:22px;padding:28px;box-shadow:0 20px 70px #0008}
+h1{margin:0 0 8px}.muted{color:#9da8c5;margin-bottom:22px}label{display:block;margin:14px 0 7px;color:#cbd3e8}
+input{width:100%;padding:13px;border-radius:11px;border:1px solid #394563;background:#0e1426;color:white;font-size:15px}
+button{width:100%;margin-top:20px;padding:14px;border:0;border-radius:12px;background:#fff;color:#101522;font-weight:700;font-size:16px;cursor:pointer}
+#msg{margin-top:18px;padding:12px;border-radius:10px;display:none;white-space:pre-wrap}.ok{background:#123b29}.err{background:#4a1820}
+.small{font-size:12px;color:#8994b0;margin-top:14px}
+</style></head>
+<body><main class="card">
+<h1>UPI Payout</h1><div class="muted">Secure server-side payout request</div>
+<label>Recipient name</label><input id="name" placeholder="Sahil Islam">
+<label>UPI ID</label><input id="upi" placeholder="name@upi">
+<label>Amount (INR)</label><input id="amount" type="number" min="2500" step="0.01" value="2500">
+<button id="send">Create payout</button>
+<div id="msg"></div>
+<div class="small">Your Client Secret is never sent to this browser.</div>
+</main>
+<script>
+const msg=document.querySelector("#msg");
+document.querySelector("#send").onclick=async()=>{
+ msg.style.display="none";
+ const body={amount:Number(document.querySelector("#amount").value),
+ recipient:{name:document.querySelector("#name").value.trim(),upi_id:document.querySelector("#upi").value.trim()}};
+ try{
+  const r=await fetch("/api/payout",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  const d=await r.json(); msg.textContent=JSON.stringify(d,null,2); msg.className=d.success?"ok":"err"; msg.style.display="block";
+ }catch(e){msg.textContent="Network/server error";msg.className="err";msg.style.display="block"}
+};
+</script></body></html>
